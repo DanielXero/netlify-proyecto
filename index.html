@@ -11,6 +11,9 @@
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
           colors: {
             primary: '#3b82f6',
             correct: '#10b981',
@@ -20,6 +23,21 @@
             vfFalse: '#f87171',
             timerWarning: '#f59e0b',
             timerCritical: '#ef4444'
+          },
+          animation: {
+            'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+            'fade-out': 'fadeOut 0.3s ease-out forwards',
+            'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            fadeInUp: {
+              '0%': { opacity: 0, transform: 'translateY(20px)' },
+              '100%': { opacity: 1, transform: 'translateY(0)' }
+            },
+            fadeOut: {
+              '0%': { opacity: 1, transform: 'translateY(0)' },
+              '100%': { opacity: 0, transform: 'translateY(-10px)' }
+            }
           }
         }
       }
@@ -27,43 +45,47 @@
   </script>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
-  <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 fade-in">
+  <div id="quiz-container" class="w-full max-w-2xl bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/50">
     <!-- Pantalla de inicio -->
-    <div id="start-screen" class="text-center">
-      <h1 class="text-3xl font-bold text-gray-800 mb-4">¡Bienvenido al Cuestionario Primer Parcial Teórico BD1 !</h1>
+    <div id="start-screen" class="text-center screen">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">¡Bienvenido al Cuestionario!</h1>
       <p class="text-gray-600 mb-2">Tienes <span class="font-semibold text-primary">45 segundos</span> por pregunta.</p>
-      <p class="text-gray-600 mb-6">¡Buena suerte!</p>
-      <button id="start-btn" class="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-blue-600 transition">
+      <p class="text-gray-600 mb-2">Al final verás tus errores con las respuestas correctas.</p>
+      <p class="text-gray-600 mb-8">¡Buena suerte!</p>
+      <button id="start-btn" class="btn-primary px-6 py-3.5 bg-primary text-white font-semibold rounded-xl hover:bg-blue-600 transition shadow-lg">
         Comenzar
       </button>
     </div>
 
     <!-- Pantalla de preguntas -->
-    <div id="question-screen" class="hidden">
-      <div class="flex justify-between items-center mb-2">
+    <div id="question-screen" class="hidden screen">
+      <div class="flex justify-between items-center mb-3">
         <span id="question-counter" class="text-sm font-medium text-gray-500"></span>
         <span id="score-display" class="text-sm font-medium text-primary"></span>
       </div>
-      <div class="flex justify-between items-center mb-2">
-        <span id="timer-display" class="text-lg font-bold text-gray-800"></span>
+      <div class="flex justify-between items-center mb-3">
+        <span id="timer-display" class="text-xl font-bold text-gray-800"></span>
         <span id="time-remaining" class="text-sm text-gray-500">45s restantes</span>
       </div>
       <div class="timer-bar">
         <div id="timer-progress" class="timer-progress" style="width: 100%"></div>
       </div>
-      <h2 id="question-text" class="text-xl font-semibold text-gray-800 mt-4 mb-6"></h2>
-      <div id="options-container" class="space-y-3 mb-6"></div>
-      <button id="next-btn" class="w-full py-3 bg-gray-200 text-gray-700 font-medium rounded-lg cursor-not-allowed opacity-50" disabled>
+      <h2 id="question-text" class="text-xl md:text-2xl font-semibold text-gray-800 mt-5 mb-6 leading-relaxed"></h2>
+      <div id="options-container" class="space-y-3 mb-7"></div>
+      <button id="next-btn" class="w-full py-3.5 bg-gray-200 text-gray-700 font-medium rounded-xl cursor-not-allowed opacity-50 transition">
         Siguiente
       </button>
     </div>
 
     <!-- Pantalla de resultados -->
-    <div id="results-screen" class="hidden text-center">
-      <h2 class="text-2xl font-bold text-gray-800 mb-4">¡Cuestionario completado!</h2>
-      <p id="final-score" class="text-lg font-semibold text-primary mb-6"></p>
-      <div class="flex justify-center gap-4">
-        <button id="restart-btn" class="px-5 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-blue-600 transition">
+    <div id="results-screen" class="hidden screen">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center">¡Cuestionario completado!</h2>
+      <p id="final-score" class="text-xl font-semibold text-primary mb-6 text-center"></p>
+      
+      <div id="detailed-results" class="mb-7 max-h-96 overflow-y-auto pr-2"></div>
+      
+      <div class="flex justify-center">
+        <button id="restart-btn" class="btn-primary px-6 py-3 bg-primary text-white font-medium rounded-xl hover:bg-blue-600 transition shadow-lg">
           Reiniciar
         </button>
       </div>
