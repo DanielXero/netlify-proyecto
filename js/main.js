@@ -1,13 +1,13 @@
 // ================================
-// CONFIGURACIÓN
-// ================================
-const TIME_PER_QUESTION = 45; // segundos
+    // CONFIGURACIÓN
+    // ================================
+    const TIME_PER_QUESTION = 45; // segundos
 
-// ================================
-// ESTRUCTURA DE PREGUNTAS (EDITABLE)
-// ================================
-const originalQuizData = [
-  {
+    // ================================
+    // ESTRUCTURA DE PREGUNTAS (EDITABLE)
+    // ================================
+    const originalQuizData = [
+   {
     tipo: "multiple_single",
     pregunta: "¿Qué es la normalización de una base de datos?",
     opciones: [
@@ -242,7 +242,7 @@ const originalQuizData = [
   {
     tipo: "multiple_single",
     pregunta:
-      "Cuando encontramos registros en una tabla de una base de datos relacional, con columnas multivaluadas, ¿es necesario aplicaralguna técnica de normalización?",
+      "Cuando encontramos registros en una tabla de una base de datos relacional, con columnas multivaluadas, ¿es necesario aplicar alguna técnica de normalización?",
     opciones: [
       "Si, se aplica la tercera forma normal",
       "Si, se utilizada la técnica de desnormalización",
@@ -257,7 +257,7 @@ const originalQuizData = [
     {
     tipo: "multiple_single",
     pregunta:
-      "¿Qué instrucción SQL principal se utiliza para definir restricciones como claves primarias, unicidad, claves foráneas en una tablaexistente?",
+      "¿Qué instrucción SQL principal se utiliza para definir restricciones como claves primarias, unicidad, claves foráneas en una tabla existente?",
     opciones: [
       "ALTER TABLE",
       "Ninguna de las opciones",
@@ -272,7 +272,7 @@ const originalQuizData = [
       {
     tipo: "multiple_single",
     pregunta:
-      "En el contexto de los Gestores de Bases de Datos Relacionales ¿Qué tipo de archivo es el principal encargado de rastreartransacciones en SQL Server?",
+      "En el contexto de los Gestores de Bases de Datos Relacionales ¿Qué tipo de archivo es el principal encargado de rastrear transacciones en SQL Server?",
     opciones: [
       "Ninguna de las opciones",
       "Archivo de datos secundario (NDF)",
@@ -283,457 +283,447 @@ const originalQuizData = [
     respuesta_correcta: [
       "Archivo de registro (LOG)",
     ],
-  },  
-        {
-    tipo: "multiple_single",
-    pregunta:
-      "¿Que es una restricción de integridad de clave externa en el modelo relacional?",
-    opciones: [
-      "Es la relación de integridad que implica a dos relaciones más frecuentes, en el cual si se modifica una de las relaciones hay quecomprobar la otra, para hacer que los datos sigan siendo consistentes",
-      "Especifica los valores permitidos para una columna determinada, garantizando la coherencia de los valores de los datos en toda labase de datos",
-      "Es la clave que debe ser única, y no puede contener valores nulos",
-      "Ninguna de las opciones",
-      "Es una declaración de que un cierto subconjunto mínimo de los campos de una relación constituye un identificador único de cada tupla",
-    ],
-    respuesta_correcta: [
-      "Es la relación de integridad que implica a dos relaciones más frecuentes, en el cual si se modifica una de las relaciones hay quecomprobar la otra, para hacer que los datos sigan siendo consistentes",
-    ],
-  }
-];
+  },
+    ];
 
-// ================================
-// FUNCIONES AUXILIARES
-// ================================
-/**
- * Mezcla aleatoriamente un arreglo (algoritmo de Fisher-Yates).
- * @param {Array} array - Arreglo a mezclar
- * @returns {Array} Nuevo arreglo mezclado
- */
-function shuffleArray(array) {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
-// ================================
-// ESTADO DE LA APLICACIÓN
-// ================================
-let quizData = []; // Preguntas mezcladas al iniciar
-let currentQuestionIndex = 0;
-let score = 0;
-let userAnswers = [];
-let timeLeft = TIME_PER_QUESTION;
-let timerInterval = null;
-
-// ================================
-// ELEMENTOS DEL DOM
-// ================================
-const startScreen = document.getElementById("start-screen");
-const questionScreen = document.getElementById("question-screen");
-const resultsScreen = document.getElementById("results-screen");
-const startBtn = document.getElementById("start-btn");
-const nextBtn = document.getElementById("next-btn");
-const restartBtn = document.getElementById("restart-btn");
-const questionText = document.getElementById("question-text");
-const optionsContainer = document.getElementById("options-container");
-const questionCounter = document.getElementById("question-counter");
-const scoreDisplay = document.getElementById("score-display");
-const finalScore = document.getElementById("final-score");
-const timerDisplay = document.getElementById("timer-display");
-const timeRemaining = document.getElementById("time-remaining");
-const timerProgress = document.getElementById("timer-progress");
-
-// ================================
-// INICIALIZAR APLICACIÓN
-// ================================
-startBtn.addEventListener("click", startQuiz);
-nextBtn.addEventListener("click", goToNextQuestion);
-restartBtn.addEventListener("click", restartQuiz);
-
-// ================================
-// FUNCIONES PRINCIPALES
-// ================================
-
-/**
- * Inicia el cuestionario: mezcla preguntas y carga la primera.
- */
-function startQuiz() {
-  // Mezclar el orden de las preguntas
-  quizData = shuffleArray(originalQuizData);
-
-  currentQuestionIndex = 0;
-  score = 0;
-  userAnswers = new Array(quizData.length).fill(null).map(() => []);
-
-  startScreen.classList.add("hidden");
-  resultsScreen.classList.add("hidden");
-  questionScreen.classList.remove("hidden");
-
-  loadQuestion();
-}
-
-/**
- * Carga y muestra la pregunta actual (con opciones mezcladas).
- */
-function loadQuestion() {
-  const question = quizData[currentQuestionIndex];
-  questionText.textContent = question.pregunta;
-  questionCounter.textContent = `Pregunta ${currentQuestionIndex + 1} de ${
-    quizData.length
-  }`;
-  scoreDisplay.textContent = `Puntaje: ${score}`;
-
-  optionsContainer.innerHTML = "";
-
-  // Renderizar según el tipo de pregunta
-  if (question.tipo === "multiple_single") {
-    renderRadioOptions(question);
-  } else if (question.tipo === "multiple_multiple") {
-    renderCheckboxOptions(question);
-  } else if (question.tipo === "vf") {
-    renderVFButtons(question);
-  }
-
-  // Reiniciar y comenzar temporizador
-  resetTimer();
-  startTimer();
-}
-
-/**
- * Renderiza opciones de selección única (radio buttons) con orden aleatorio.
- */
-function renderRadioOptions(question) {
-  // ¡Mezclar las opciones cada vez que se carga la pregunta!
-  const shuffledOptions = shuffleArray(question.opciones);
-
-  shuffledOptions.forEach((option) => {
-    const label = document.createElement("label");
-    label.className =
-      "flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition";
-
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = `question-${currentQuestionIndex}`;
-    radio.className = "radio-custom";
-    radio.value = option;
-    radio.addEventListener("change", () => {
-      userAnswers[currentQuestionIndex] = [option];
-      updateNextButtonState();
-    });
-
-    const span = document.createElement("span");
-    span.textContent = option;
-    span.className = "text-gray-800";
-
-    label.appendChild(radio);
-    label.appendChild(span);
-    optionsContainer.appendChild(label);
-  });
-}
-
-/**
- * Renderiza opciones de selección múltiple (checkboxes) con orden aleatorio.
- */
-function renderCheckboxOptions(question) {
-  // ¡Mezclar las opciones cada vez que se carga la pregunta!
-  const shuffledOptions = shuffleArray(question.opciones);
-
-  shuffledOptions.forEach((option) => {
-    const label = document.createElement("label");
-    label.className =
-      "flex items-center p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition";
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.className = "checkbox-custom";
-    checkbox.value = option;
-    checkbox.addEventListener("change", () => {
-      if (checkbox.checked) {
-        if (!userAnswers[currentQuestionIndex].includes(option)) {
-          userAnswers[currentQuestionIndex].push(option);
-        }
-      } else {
-        userAnswers[currentQuestionIndex] = userAnswers[
-          currentQuestionIndex
-        ].filter((val) => val !== option);
+    // ================================
+    // FUNCIONES AUXILIARES
+    // ================================
+    function shuffleArray(array) {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-      updateNextButtonState();
-    });
-
-    const span = document.createElement("span");
-    span.textContent = option;
-    span.className = "text-gray-800";
-
-    label.appendChild(checkbox);
-    label.appendChild(span);
-    optionsContainer.appendChild(label);
-  });
-}
-
-/**
- * Renderiza botones para Verdadero/Falso (sin mezcla, ya que solo hay dos).
- */
-function renderVFButtons(question) {
-  // Para VF no se mezcla porque solo hay dos opciones fijas
-  const trueBtn = document.createElement("button");
-  trueBtn.type = "button";
-  trueBtn.className =
-    "vf-button true w-full py-3 font-semibold rounded-lg border-2 transition";
-  trueBtn.textContent = "Verdadero";
-  trueBtn.dataset.value = "true";
-  trueBtn.addEventListener("click", () => selectVF(trueBtn, true));
-
-  const falseBtn = document.createElement("button");
-  falseBtn.type = "button";
-  falseBtn.className =
-    "vf-button false w-full py-3 font-semibold rounded-lg border-2 transition mt-3";
-  falseBtn.textContent = "Falso";
-  falseBtn.dataset.value = "false";
-  falseBtn.addEventListener("click", () => selectVF(falseBtn, false));
-
-  optionsContainer.appendChild(trueBtn);
-  optionsContainer.appendChild(falseBtn);
-}
-
-/**
- * Maneja la selección en preguntas Verdadero/Falso.
- */
-function selectVF(button, value) {
-  document.querySelectorAll(".vf-button").forEach((btn) => {
-    btn.classList.remove("selected");
-  });
-  button.classList.add("selected");
-  userAnswers[currentQuestionIndex] = [value];
-  updateNextButtonState();
-}
-
-/**
- * Actualiza el estado del botón "Siguiente".
- */
-function updateNextButtonState() {
-  const hasAnswer = userAnswers[currentQuestionIndex].length > 0;
-  nextBtn.disabled = !hasAnswer;
-  if (hasAnswer) {
-    nextBtn.classList.replace("bg-gray-200", "bg-primary");
-    nextBtn.classList.replace("text-gray-700", "text-white");
-    nextBtn.classList.remove("cursor-not-allowed", "opacity-50");
-  } else {
-    nextBtn.classList.replace("bg-primary", "bg-gray-200");
-    nextBtn.classList.replace("text-white", "text-gray-700");
-    nextBtn.classList.add("cursor-not-allowed", "opacity-50");
-  }
-}
-
-// ================================
-// TEMPORIZADOR
-// ================================
-
-function startTimer() {
-  clearInterval(timerInterval);
-  timeLeft = TIME_PER_QUESTION;
-  updateTimerDisplay();
-
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerDisplay();
-
-    if (timeLeft <= 0) {
-      clearInterval(timerInterval);
-      handleTimeUp();
+      return shuffled;
     }
-  }, 1000);
-}
 
-function updateTimerDisplay() {
-  timerDisplay.textContent = `${timeLeft}s`;
-  timeRemaining.textContent = `${timeLeft}s restantes`;
+    // ================================
+    // ESTADO DE LA APLICACIÓN
+    // ================================
+    let quizData = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    let timeLeft = TIME_PER_QUESTION;
+    let timerInterval = null;
 
-  const progressPercent = (timeLeft / TIME_PER_QUESTION) * 100;
-  timerProgress.style.width = `${progressPercent}%`;
+    // ================================
+    // ELEMENTOS DEL DOM
+    // ================================
+    const startScreen = document.getElementById('start-screen');
+    const questionScreen = document.getElementById('question-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const questionCounter = document.getElementById('question-counter');
+    const scoreDisplay = document.getElementById('score-display');
+    const finalScore = document.getElementById('final-score');
+    const detailedResults = document.getElementById('detailed-results');
+    const timerDisplay = document.getElementById('timer-display');
+    const timeRemaining = document.getElementById('time-remaining');
+    const timerProgress = document.getElementById('timer-progress');
 
-  if (timeLeft <= 10) {
-    timerProgress.style.backgroundColor = "#ef4444";
-    timerDisplay.className = "text-lg font-bold text-incorrect";
-  } else if (timeLeft <= 20) {
-    timerProgress.style.backgroundColor = "#f59e0b";
-    timerDisplay.className = "text-lg font-bold text-timerWarning";
-  } else {
-    timerProgress.style.backgroundColor = "#3b82f6";
-    timerDisplay.className = "text-lg font-bold text-gray-800";
-  }
-}
+    // ================================
+    // INICIALIZAR APLICACIÓN
+    // ================================
+    startBtn.addEventListener('click', startQuiz);
+    nextBtn.addEventListener('click', goToNextQuestion);
+    restartBtn.addEventListener('click', restartQuiz);
 
-function resetTimer() {
-  clearInterval(timerInterval);
-  timeLeft = TIME_PER_QUESTION;
-  timerProgress.style.width = "100%";
-  timerProgress.style.backgroundColor = "#3b82f6";
-  timerDisplay.className = "text-lg font-bold text-gray-800";
-}
+    // ================================
+    // FUNCIONES PRINCIPALES
+    // ================================
 
-function handleTimeUp() {
-  if (userAnswers[currentQuestionIndex].length === 0) {
-    userAnswers[currentQuestionIndex] = [];
-  }
-
-  const question = quizData[currentQuestionIndex];
-  const userSelection = userAnswers[currentQuestionIndex];
-  const correctAnswers = question.respuesta_correcta;
-
-  let isCorrect = false;
-  if (question.tipo === "vf") {
-    isCorrect = userSelection[0] === correctAnswers;
-  } else if (userSelection.length > 0) {
-    const userSet = new Set(userSelection);
-    const correctSet = new Set(correctAnswers);
-    isCorrect =
-      userSet.size === correctSet.size &&
-      [...userSet].every((val) => correctSet.has(val));
-  }
-
-  if (isCorrect) {
-    score++;
-  }
-
-  showFeedback(question, userSelection, correctAnswers, isCorrect);
-
-  currentQuestionIndex++;
-
-  if (currentQuestionIndex < quizData.length) {
-    setTimeout(loadQuestion, 1200);
-  } else {
-    setTimeout(showResults, 1200);
-  }
-}
-
-// ================================
-// NAVEGACIÓN
-// ================================
-
-function goToNextQuestion() {
-  clearInterval(timerInterval);
-
-  const question = quizData[currentQuestionIndex];
-  const userSelection = userAnswers[currentQuestionIndex];
-  const correctAnswers = question.respuesta_correcta;
-
-  let isCorrect = false;
-  if (question.tipo === "vf") {
-    isCorrect = userSelection[0] === correctAnswers;
-  } else {
-    const userSet = new Set(userSelection);
-    const correctSet = new Set(correctAnswers);
-    isCorrect =
-      userSet.size === correctSet.size &&
-      [...userSet].every((val) => correctSet.has(val));
-  }
-
-  if (isCorrect) {
-    score++;
-  }
-
-  showFeedback(question, userSelection, correctAnswers, isCorrect);
-
-  currentQuestionIndex++;
-
-  if (currentQuestionIndex < quizData.length) {
-    setTimeout(loadQuestion, 1200);
-  } else {
-    setTimeout(showResults, 1200);
-  }
-}
-
-function showFeedback(question, userSelection, correctAnswers, isCorrect) {
-  const labels = Array.from(optionsContainer.querySelectorAll("label"));
-  const vfButtons = Array.from(optionsContainer.querySelectorAll(".vf-button"));
-
-  if (question.tipo === "vf") {
-    const correctBtn = correctAnswers
-      ? vfButtons.find((btn) => btn.dataset.value === "true")
-      : vfButtons.find((btn) => btn.dataset.value === "false");
-    if (correctBtn) correctBtn.classList.add("selected");
-
-    if (!isCorrect && userSelection.length > 0) {
-      const userBtn = userSelection[0]
-        ? vfButtons.find((btn) => btn.dataset.value === "true")
-        : vfButtons.find((btn) => btn.dataset.value === "false");
-      if (userBtn && userBtn !== correctBtn) {
-        userBtn.classList.remove("selected");
-        userBtn.classList.add("bg-incorrect", "text-white");
-      }
+    function startQuiz() {
+      quizData = shuffleArray(originalQuizData);
+      currentQuestionIndex = 0;
+      score = 0;
+      userAnswers = new Array(quizData.length).fill(null).map(() => []);
+      
+      startScreen.classList.add('fade-out');
+      setTimeout(() => {
+        startScreen.classList.add('hidden');
+        questionScreen.classList.remove('hidden');
+        loadQuestion();
+      }, 300);
     }
-    vfButtons.forEach((btn) => (btn.disabled = true));
-  } else {
-    correctAnswers.forEach((correct) => {
-      const label = labels.find(
-        (l) => l.querySelector("span").textContent === correct
-      );
-      if (label) {
-        label.style.backgroundColor = "#dcfce7";
-        label.style.borderColor = "#22c55e";
-        label.querySelector("span").style.color = "#166534";
-        const input = label.querySelector("input");
-        if (input) {
-          input.style.borderColor = "#22c55e";
-          input.style.backgroundColor = "#22c55e";
-        }
-      }
-    });
 
-    if (!isCorrect) {
-      userSelection.forEach((selected) => {
-        if (!correctAnswers.includes(selected)) {
-          const label = labels.find(
-            (l) => l.querySelector("span").textContent === selected
-          );
-          if (label) {
-            label.style.backgroundColor = "#fee2e2";
-            label.style.borderColor = "#f87171";
-            label.querySelector("span").style.color = "#991b1b";
-            const input = label.querySelector("input");
-            if (input) {
-              input.style.borderColor = "#f87171";
-              input.style.backgroundColor = "#f87171";
-            }
-          }
-        }
+    function loadQuestion() {
+      const question = quizData[currentQuestionIndex];
+      questionText.textContent = question.pregunta;
+      questionCounter.textContent = `Pregunta ${currentQuestionIndex + 1} de ${quizData.length}`;
+      scoreDisplay.textContent = `Puntaje: ${score}`;
+
+      optionsContainer.innerHTML = '';
+
+      if (question.tipo === 'multiple_single') {
+        renderRadioOptions(question);
+      } else if (question.tipo === 'multiple_multiple') {
+        renderCheckboxOptions(question);
+      } else if (question.tipo === 'vf') {
+        renderVFButtons(question);
+      }
+
+      resetTimer();
+      startTimer();
+    }
+
+    function renderRadioOptions(question) {
+      const shuffledOptions = shuffleArray(question.opciones);
+      shuffledOptions.forEach(option => {
+        const label = document.createElement('label');
+        label.className = 'flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-all duration-200';
+        
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = `question-${currentQuestionIndex}`;
+        radio.className = 'radio-custom';
+        radio.value = option;
+        radio.addEventListener('change', () => {
+          userAnswers[currentQuestionIndex] = [option];
+          updateNextButtonState();
+        });
+        
+        const span = document.createElement('span');
+        span.textContent = option;
+        span.className = 'text-gray-800 font-medium';
+        
+        label.appendChild(radio);
+        label.appendChild(span);
+        optionsContainer.appendChild(label);
       });
     }
 
-    labels.forEach((label) => {
-      label.style.pointerEvents = "none";
-      const input = label.querySelector("input");
-      if (input) input.disabled = true;
-    });
-  }
+    function renderCheckboxOptions(question) {
+      const shuffledOptions = shuffleArray(question.opciones);
+      shuffledOptions.forEach(option => {
+        const label = document.createElement('label');
+        label.className = 'flex items-center p-4 bg-gray-50 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-all duration-200';
+        
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'checkbox-custom';
+        checkbox.value = option;
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            if (!userAnswers[currentQuestionIndex].includes(option)) {
+              userAnswers[currentQuestionIndex].push(option);
+            }
+          } else {
+            userAnswers[currentQuestionIndex] = userAnswers[currentQuestionIndex].filter(val => val !== option);
+          }
+          updateNextButtonState();
+        });
+        
+        const span = document.createElement('span');
+        span.textContent = option;
+        span.className = 'text-gray-800 font-medium';
+        
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        optionsContainer.appendChild(label);
+      });
+    }
 
-  nextBtn.disabled = true;
-}
+    function renderVFButtons(question) {
+      const trueBtn = document.createElement('button');
+      trueBtn.type = 'button';
+      trueBtn.className = 'vf-button true w-full py-4 font-semibold rounded-xl border-2 transition';
+      trueBtn.textContent = 'Verdadero';
+      trueBtn.dataset.value = 'true';
+      trueBtn.addEventListener('click', () => selectVF(trueBtn, true));
 
-function showResults() {
-  questionScreen.classList.add("hidden");
-  resultsScreen.classList.remove("hidden");
-  finalScore.textContent = `Tu puntaje final es: ${score} de ${quizData.length}`;
-}
+      const falseBtn = document.createElement('button');
+      falseBtn.type = 'button';
+      falseBtn.className = 'vf-button false w-full py-4 font-semibold rounded-xl border-2 transition mt-4';
+      falseBtn.textContent = 'Falso';
+      falseBtn.dataset.value = 'false';
+      falseBtn.addEventListener('click', () => selectVF(falseBtn, false));
 
-function restartQuiz() {
-  clearInterval(timerInterval);
-  resultsScreen.classList.add("hidden");
-  startScreen.classList.remove("hidden");
-}
+      optionsContainer.appendChild(trueBtn);
+      optionsContainer.appendChild(falseBtn);
+    }
 
-/*
-      ✅ ALEATORIZACIÓN COMPLETA:
-        - Las preguntas se reordenan al iniciar el cuestionario.
-        - Las OPCIONES dentro de cada pregunta se reordenan CADA VEZ que se carga la pregunta.
-        - Esto significa que incluso si repites el cuestionario, las opciones aparecerán en orden diferente.
+    function selectVF(button, value) {
+      document.querySelectorAll('.vf-button').forEach(btn => {
+        btn.classList.remove('selected');
+      });
+      button.classList.add('selected');
+      userAnswers[currentQuestionIndex] = [value];
+      updateNextButtonState();
+    }
 
-      💡 MEJORES PRÁCTICAS UX/UI:
-        - Evita que los usuarios memoricen posiciones de respuestas.
-        - Cada intento es una experiencia única.
-        - El algoritmo de Fisher-Yates garantiza una mezcla justa y uniforme.
-        - Las preguntas Verdadero/Falso no se mezclan (solo tienen dos opciones fijas).
-    */
+    function updateNextButtonState() {
+      const hasAnswer = userAnswers[currentQuestionIndex].length > 0;
+      nextBtn.disabled = !hasAnswer;
+      if (hasAnswer) {
+        nextBtn.classList.replace('bg-gray-200', 'bg-primary');
+        nextBtn.classList.replace('text-gray-700', 'text-white');
+        nextBtn.classList.remove('cursor-not-allowed', 'opacity-50');
+      } else {
+        nextBtn.classList.replace('bg-primary', 'bg-gray-200');
+        nextBtn.classList.replace('text-white', 'text-gray-700');
+        nextBtn.classList.add('cursor-not-allowed', 'opacity-50');
+      }
+    }
+
+    // ================================
+    // TEMPORIZADOR
+    // ================================
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = TIME_PER_QUESTION;
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          handleTimeUp();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      timerDisplay.textContent = `${timeLeft}s`;
+      timeRemaining.textContent = `${timeLeft}s restantes`;
+
+      const progressPercent = (timeLeft / TIME_PER_QUESTION) * 100;
+      timerProgress.style.width = `${progressPercent}%`;
+
+      if (timeLeft <= 10) {
+        timerProgress.style.backgroundColor = '#ef4444';
+        timerDisplay.className = 'text-xl font-bold text-incorrect';
+      } else if (timeLeft <= 20) {
+        timerProgress.style.backgroundColor = '#f59e0b';
+        timerDisplay.className = 'text-xl font-bold text-timerWarning';
+      } else {
+        timerProgress.style.backgroundColor = '#3b82f6';
+        timerDisplay.className = 'text-xl font-bold text-gray-800';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timeLeft = TIME_PER_QUESTION;
+      timerProgress.style.width = '100%';
+      timerProgress.style.backgroundColor = '#3b82f6';
+      timerDisplay.className = 'text-xl font-bold text-gray-800';
+    }
+
+    function handleTimeUp() {
+      if (userAnswers[currentQuestionIndex].length === 0) {
+        userAnswers[currentQuestionIndex] = [];
+      }
+
+      const question = quizData[currentQuestionIndex];
+      const userSelection = userAnswers[currentQuestionIndex];
+      const correctAnswers = question.respuesta_correcta;
+
+      let isCorrect = false;
+      if (question.tipo === 'vf') {
+        isCorrect = userSelection[0] === correctAnswers;
+      } else if (userSelection.length > 0) {
+        const userSet = new Set(userSelection);
+        const correctSet = new Set(correctAnswers);
+        isCorrect = (
+          userSet.size === correctSet.size &&
+          [...userSet].every(val => correctSet.has(val))
+        );
+      }
+
+      if (isCorrect) {
+        score++;
+      }
+
+      showFeedback(question, userSelection, correctAnswers, isCorrect);
+
+      currentQuestionIndex++;
+
+      if (currentQuestionIndex < quizData.length) {
+        setTimeout(loadQuestion, 1200);
+      } else {
+        setTimeout(showResults, 1200);
+      }
+    }
+
+    // ================================
+    // NAVEGACIÓN
+    // ================================
+
+    function goToNextQuestion() {
+      clearInterval(timerInterval);
+
+      const question = quizData[currentQuestionIndex];
+      const userSelection = userAnswers[currentQuestionIndex];
+      const correctAnswers = question.respuesta_correcta;
+
+      let isCorrect = false;
+      if (question.tipo === 'vf') {
+        isCorrect = userSelection[0] === correctAnswers;
+      } else {
+        const userSet = new Set(userSelection);
+        const correctSet = new Set(correctAnswers);
+        isCorrect = (
+          userSet.size === correctSet.size &&
+          [...userSet].every(val => correctSet.has(val))
+        );
+      }
+
+      if (isCorrect) {
+        score++;
+      }
+
+      showFeedback(question, userSelection, correctAnswers, isCorrect);
+
+      currentQuestionIndex++;
+
+      if (currentQuestionIndex < quizData.length) {
+        setTimeout(loadQuestion, 1200);
+      } else {
+        setTimeout(showResults, 1200);
+      }
+    }
+
+    function showFeedback(question, userSelection, correctAnswers, isCorrect) {
+      const labels = Array.from(optionsContainer.querySelectorAll('label'));
+      const vfButtons = Array.from(optionsContainer.querySelectorAll('.vf-button'));
+
+      if (question.tipo === 'vf') {
+        const correctBtn = correctAnswers ? 
+          vfButtons.find(btn => btn.dataset.value === 'true') :
+          vfButtons.find(btn => btn.dataset.value === 'false');
+        if (correctBtn) correctBtn.classList.add('selected');
+        
+        if (!isCorrect && userSelection.length > 0) {
+          const userBtn = userSelection[0] ? 
+            vfButtons.find(btn => btn.dataset.value === 'true') :
+            vfButtons.find(btn => btn.dataset.value === 'false');
+          if (userBtn && userBtn !== correctBtn) {
+            userBtn.classList.remove('selected');
+            userBtn.classList.add('bg-incorrect', 'text-white');
+          }
+        }
+        vfButtons.forEach(btn => btn.disabled = true);
+      } else {
+        correctAnswers.forEach(correct => {
+          const label = labels.find(l => l.querySelector('span').textContent === correct);
+          if (label) {
+            label.style.backgroundColor = '#dcfce7';
+            label.style.borderColor = '#22c55e';
+            label.querySelector('span').style.color = '#166534';
+            const input = label.querySelector('input');
+            if (input) {
+              input.style.borderColor = '#22c55e';
+              input.style.backgroundColor = '#22c55e';
+            }
+          }
+        });
+
+        if (!isCorrect) {
+          userSelection.forEach(selected => {
+            if (!correctAnswers.includes(selected)) {
+              const label = labels.find(l => l.querySelector('span').textContent === selected);
+              if (label) {
+                label.style.backgroundColor = '#fee2e2';
+                label.style.borderColor = '#f87171';
+                label.querySelector('span').style.color = '#991b1b';
+                const input = label.querySelector('input');
+                if (input) {
+                  input.style.borderColor = '#f87171';
+                  input.style.backgroundColor = '#f87171';
+                }
+              }
+            }
+          });
+        }
+
+        labels.forEach(label => {
+          label.style.pointerEvents = 'none';
+          const input = label.querySelector('input');
+          if (input) input.disabled = true;
+        });
+      }
+
+      nextBtn.disabled = true;
+    }
+
+    function showResults() {
+      questionScreen.classList.add('fade-out');
+      setTimeout(() => {
+        questionScreen.classList.add('hidden');
+        resultsScreen.classList.remove('hidden');
+        finalScore.textContent = `Tu puntaje final es: ${score} de ${quizData.length}`;
+
+        // Generar resultados detallados
+        detailedResults.innerHTML = '<h3 class="text-lg font-semibold text-gray-800 mb-4">Resumen detallado:</h3>';
+        
+        quizData.forEach((question, index) => {
+          const userSelection = userAnswers[index];
+          const correctAnswers = question.respuesta_correcta;
+          let isCorrect = false;
+
+          if (question.tipo === 'vf') {
+            isCorrect = userSelection[0] === correctAnswers;
+          } else if (userSelection.length > 0) {
+            const userSet = new Set(userSelection);
+            const correctSet = new Set(correctAnswers);
+            isCorrect = (
+              userSet.size === correctSet.size &&
+              [...userSet].every(val => correctSet.has(val))
+            );
+          }
+
+          const resultItem = document.createElement('div');
+          resultItem.className = `result-item ${isCorrect ? 'correct' : 'incorrect'} transition-transform duration-200`;
+
+          // Formatear respuestas del usuario
+          let userAnswerText = 'No respondida';
+          if (userSelection.length > 0) {
+            if (question.tipo === 'vf') {
+              userAnswerText = userSelection[0] ? 'Verdadero' : 'Falso';
+            } else {
+              userAnswerText = userSelection.join(', ');
+            }
+          }
+
+          // Formatear respuestas correctas
+          let correctAnswerText = '';
+          if (question.tipo === 'vf') {
+            correctAnswerText = correctAnswers ? 'Verdadero' : 'Falso';
+          } else {
+            correctAnswerText = correctAnswers.join(', ');
+          }
+
+          resultItem.innerHTML = `
+            <p class="font-medium text-gray-800 mb-2">${question.pregunta}</p>
+            <p class="text-sm mb-1">
+              <span class="font-medium">Tu respuesta:</span> 
+              <span class="${isCorrect ? 'text-green-600' : 'user-answer'}">${userAnswerText}</span>
+            </p>
+            <p class="text-sm">
+              <span class="font-medium">Respuesta correcta:</span> 
+              <span class="correct-answer">${correctAnswerText}</span>
+            </p>
+          `;
+
+          detailedResults.appendChild(resultItem);
+        });
+      }, 300);
+    }
+
+    function restartQuiz() {
+      clearInterval(timerInterval);
+      resultsScreen.classList.add('fade-out');
+      setTimeout(() => {
+        resultsScreen.classList.add('hidden');
+        startScreen.classList.remove('hidden', 'fade-out');
+      }, 300);
+    }
