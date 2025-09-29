@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cuestionario Interactivo - Opciones Aleatorias</title>
+  <!-- Tailwind CSS v3.3 vía CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            correct: '#10b981',
+            incorrect: '#ef4444',
+            selected: '#dbeafe',
+            vfTrue: '#22c55e',
+            vfFalse: '#f87171',
+            timerWarning: '#f59e0b',
+            timerCritical: '#ef4444'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 fade-in">
+    <!-- Pantalla de inicio -->
+    <div id="start-screen" class="text-center">
+      <h1 class="text-3xl font-bold text-gray-800 mb-4">¡Bienvenido al Cuestionario Primer Parcial Teórico BD1 !</h1>
+      <p class="text-gray-600 mb-2">Tienes <span class="font-semibold text-primary">45 segundos</span> por pregunta.</p>
+      <p class="text-gray-600 mb-6">¡Buena suerte!</p>
+      <button id="start-btn" class="px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-blue-600 transition">
+        Comenzar
+      </button>
+    </div>
+
+    <!-- Pantalla de preguntas -->
+    <div id="question-screen" class="hidden">
+      <div class="flex justify-between items-center mb-2">
+        <span id="question-counter" class="text-sm font-medium text-gray-500"></span>
+        <span id="score-display" class="text-sm font-medium text-primary"></span>
+      </div>
+      <div class="flex justify-between items-center mb-2">
+        <span id="timer-display" class="text-lg font-bold text-gray-800"></span>
+        <span id="time-remaining" class="text-sm text-gray-500">45s restantes</span>
+      </div>
+      <div class="timer-bar">
+        <div id="timer-progress" class="timer-progress" style="width: 100%"></div>
+      </div>
+      <h2 id="question-text" class="text-xl font-semibold text-gray-800 mt-4 mb-6"></h2>
+      <div id="options-container" class="space-y-3 mb-6"></div>
+      <button id="next-btn" class="w-full py-3 bg-gray-200 text-gray-700 font-medium rounded-lg cursor-not-allowed opacity-50" disabled>
+        Siguiente
+      </button>
+    </div>
+
+    <!-- Pantalla de resultados -->
+    <div id="results-screen" class="hidden text-center">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">¡Cuestionario completado!</h2>
+      <p id="final-score" class="text-lg font-semibold text-primary mb-6"></p>
+      <div class="flex justify-center gap-4">
+        <button id="restart-btn" class="px-5 py-2.5 bg-primary text-white font-medium rounded-lg hover:bg-blue-600 transition">
+          Reiniciar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
