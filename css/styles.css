@@ -1,29 +1,46 @@
- body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background-color: #f9fafb;
+body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
     }
-    .fade-in {
-      animation: fadeIn 0.5s ease-in-out;
+
+    /* Animaciones de transición entre pantallas */
+    .screen {
+      animation: fade-in-up 0.6s ease-out;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .screen.fade-out {
+      animation: fade-out 0.3s ease-out forwards;
     }
-    /* Estilos personalizados para inputs */
-    .radio-custom {
+
+    /* Estilos personalizados para inputs con animaciones */
+    .radio-custom,
+    .checkbox-custom {
       appearance: none;
       width: 1.25rem;
       height: 1.25rem;
       border: 2px solid #d1d5db;
-      border-radius: 50%;
       margin-right: 0.75rem;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .radio-custom {
+      border-radius: 50%;
+    }
+    .checkbox-custom {
+      border-radius: 0.25rem;
+    }
+    .radio-custom:hover,
+    .checkbox-custom:hover {
+      transform: scale(1.1);
     }
     .radio-custom:checked {
       border-color: #3b82f6;
       background-color: #3b82f6;
+    }
+    .checkbox-custom:checked {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
     }
     .radio-custom:checked::after {
       content: '';
@@ -36,21 +53,6 @@
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
-    .checkbox-custom {
-      appearance: none;
-      width: 1.25rem;
-      height: 1.25rem;
-      border: 2px solid #d1d5db;
-      border-radius: 0.25rem;
-      margin-right: 0.75rem;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.2s;
-    }
-    .checkbox-custom:checked {
-      background-color: #3b82f6;
-      border-color: #3b82f6;
-    }
     .checkbox-custom:checked::after {
       content: '✓';
       position: absolute;
@@ -60,9 +62,19 @@
       color: white;
       transform: translate(-50%, -50%);
     }
+
+    /* Botones Verdadero/Falso con animaciones */
     .vf-button {
-      transition: all 0.2s;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       font-weight: 600;
+      will-change: transform, background-color;
+    }
+    .vf-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .vf-button:active {
+      transform: translateY(0);
     }
     .vf-button.true {
       background-color: #dcfce7;
@@ -88,7 +100,8 @@
       background-color: #dc2626;
       color: white;
     }
-    /* Estilo para la barra de progreso del temporizador */
+
+    /* Barra de progreso del temporizador */
     .timer-bar {
       height: 6px;
       background-color: #e5e7eb;
@@ -99,5 +112,65 @@
     .timer-progress {
       height: 100%;
       background-color: #3b82f6;
-      transition: width 0.1s linear, background-color 0.3s ease;
+      transition: width 0.3s linear, background-color 0.3s ease;
+      border-radius: 3px;
+    }
+
+    /* Resultados detallados con mejor jerarquía */
+    .result-item {
+      border-left: 4px solid #3b82f6;
+      background-color: #f8fafc;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      border-radius: 0 0.75rem 0.75rem 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: transform 0.2s;
+    }
+    .result-item:hover {
+      transform: translateX(4px);
+    }
+    .result-item.incorrect {
+      border-left-color: #ef4444;
+      background-color: #fef2f2;
+    }
+    .result-item.correct {
+      border-left-color: #10b981;
+      background-color: #f0fdf4;
+    }
+    .user-answer {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    .correct-answer {
+      color: #059669;
+      font-weight: 600;
+    }
+
+    /* Botones principales con microinteracciones */
+    .btn-primary {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, background-color;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Scroll suave para resultados */
+    #detailed-results {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
+    #detailed-results::-webkit-scrollbar {
+      width: 8px;
+    }
+    #detailed-results::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #detailed-results::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
     }
