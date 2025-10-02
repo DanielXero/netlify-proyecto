@@ -134,6 +134,32 @@
     ],
     respuesta_correcta: ["CREATE, ALTER, DROP"],
   },
+        {
+    tipo: "multiple_single",
+    pregunta:
+      "El núcleo de instrucciones SQL para el control de datos (DCL), está formado por las sentencias:",
+    opciones: [
+      "CREATE, SELECT, INSERT",
+      "CREATE, ALTER, DROP",
+      "INSERT INTO, UPDATE, DELETE",
+      "GRANT, REVOKE",
+      "Ninguna de las opciones",
+    ],
+    respuesta_correcta: ["GRANT, REVOKE"],
+  },
+                {
+    tipo: "multiple_single",
+    pregunta:
+      "El núcleo de instrucciones SQL para el control de TRANSACCIONES (TCL), está formado por las sentencias:",
+    opciones: [
+      "COMMIT, ROLLBACK, BEGIN TRANSACTION",
+      "CREATE, ALTER, DROP",
+      "INSERT INTO, UPDATE, DELETE",
+      "GRANT, REVOKE",
+      "Ninguna de las opciones",
+    ],
+    respuesta_correcta: ["GRANT, REVOKE"],
+  },
   {
     tipo: "multiple_single",
     pregunta:
@@ -727,3 +753,4 @@
         startScreen.classList.remove('hidden', 'fade-out');
       }, 300);
     }
+
