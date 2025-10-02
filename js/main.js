@@ -158,7 +158,7 @@
       "GRANT, REVOKE",
       "Ninguna de las opciones",
     ],
-    respuesta_correcta: ["GRANT, REVOKE"],
+    respuesta_correcta: ["COMMIT, ROLLBACK, BEGIN TRANSACTION"],
   },
   {
     tipo: "multiple_single",
